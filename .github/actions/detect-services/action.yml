@@ -1,0 +1,21 @@
+name: Detect Changed Services
+description: Detects changed services in a monorepo
+
+inputs:
+  shared_dir:
+    description: "Shared directory to watch"
+    required: true
+
+outputs:
+  services:
+    description: "Changed services as JSON"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      id: detect
+      run: |
+        chmod +x ${{ github.action_path }}/detect.sh
+        output=$(${{ github.action_path }}/detect.sh "${{ inputs.shared_dir }}")
+        echo "services=$output" >> $GITHUB_OUTPUT
