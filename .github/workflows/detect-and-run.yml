@@ -1,0 +1,31 @@
+name: Detect and Run CI
+
+on:
+  workflow_call:
+    inputs:
+      shared_dir:
+        description: 'Shared directory name used by all microservices'
+        required: true
+        type: string
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.detect.outputs.services }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        run: |
+          services=$(bash scripts/detect-changed-services.sh ${{ inputs.shared_dir }})
+          echo "services=$services" >> $GITHUB_OUTPUT
+
+  run-services:
+    needs: detect
+    if: ${{ needs.detect.outputs.services != '' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect.outputs.services) }}
+    uses: Aeronous/cicd-template/.github/workflows/ci-core.yml@main
+    with:
+      service_path: ${{ matrix.service }}
