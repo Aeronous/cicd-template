@@ -12,4 +12,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Show selected service
-        run: echo "🛠 Running CI for service: ${{ inputs.service_path }}"
+        run: |
+            echo "🛠 Running CI for service: ${{ inputs.service_path }}"
