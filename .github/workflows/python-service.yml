@@ -13,8 +13,8 @@ on:
         required: false
         type: boolean
         default: true
-      security:
-        description: 'Run security'
+      gitleaks:
+        description: 'Run gitleaks'
         required: false
         type: boolean
         default: true
@@ -82,8 +82,8 @@ jobs:
       services: ${{ needs.detect.outputs.services }}
       python_version: ${{ inputs.python_version }}
 
-  security:
-    if: ${{ inputs.security }}
+  gitleaks:
+    if: ${{ inputs.gitleaks }}
     needs: detect
     strategy:
       matrix:
