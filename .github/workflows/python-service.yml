@@ -7,6 +7,15 @@ on:
         description: 'Shared folder prefix (e.g., core)'
         required: true
         type: string
+      event_name:
+        required: true
+        type: string
+      ref:
+        required: true
+        type: string
+      base_ref:
+        required: false
+        type: string
 
 jobs:
   detect:
@@ -26,8 +35,8 @@ jobs:
   run-feature:
     needs: detect
     if: >
-      github.event_name == 'push' &&
-      startsWith(github.ref, 'refs/heads/feature/') &&
+      inputs.event_name == 'push' &&
+      startsWith(inputs.ref, 'refs/heads/feature/') &&
       ${{ needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
@@ -39,8 +48,8 @@ jobs:
   run-dev:
     needs: detect
     if: >
-      github.event_name == 'pull_request' &&
-      github.base_ref == 'dev' &&
+      inputs.event_name == 'pull_request' &&
+      inputs.base_ref == 'dev' &&
       ${{ needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
@@ -52,8 +61,8 @@ jobs:
   run-prod:
     needs: detect
     if: >
-      github.event_name == 'pull_request' &&
-      github.base_ref == 'main' &&
+      inputs.event_name == 'pull_request' &&
+      inputs.base_ref == 'main' &&
       ${{ needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
