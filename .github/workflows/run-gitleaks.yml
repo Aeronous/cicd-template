@@ -37,7 +37,10 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/Aeronous/cicd-template/main/config/.gitleaks.toml -o .gitleaks.toml
 
       - name: Run Gitleaks scan and generate SARIF
-        uses: gacts/gitleaks@v2
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
         with:
           config-path: .gitleaks.toml
           report-format: sarif
