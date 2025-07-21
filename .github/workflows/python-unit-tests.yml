@@ -25,6 +25,9 @@ on:
 
 jobs:
   unit-test-python:
+    permissions:
+      contents: read
+      checks: write
     if: |
       inputs.event_name == 'push' && startsWith(inputs.ref, 'refs/heads/feature/') && inputs.services != '[]' ||
       inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && inputs.services != '[]'
