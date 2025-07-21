@@ -1,0 +1,53 @@
+name: Lint Python Files
+
+on:
+  workflow_call:
+    inputs:
+      services:
+        required: true
+        type: string
+      event_name:
+        required: true
+        type: string
+      ref:
+        required: true
+        type: string
+      base_ref:
+        required: false
+        type: string
+      service_path:
+        required: true
+        type: string
+      python_version:
+        required: false
+        type: string
+        default: '3.10'
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.service_path }}
+    if: |
+      inputs.event_name == 'push' && startsWith(inputs.ref, 'refs/heads/feature/') && inputs.services != '[]' ||
+      inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && inputs.services != '[]'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Run flake8 on Python files
+        run: |
+          echo "🔍 Running lint only on .py files..."
+          FILES=$(find . -name '*.py')
+          echo "Found files:"
+          echo "$FILES"
+          echo "$FILES" | xargs flake8 --exit-zero
