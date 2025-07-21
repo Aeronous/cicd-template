@@ -34,10 +34,7 @@ jobs:
 
   run-feature:
     needs: detect
-    if: >
-      inputs.event_name == 'push' &&
-      startsWith(inputs.ref, 'refs/heads/feature/') &&
-      ${{ needs.detect.outputs.services != '[]' }}
+    if: ${{ inputs.event_name == 'push' && startsWith(inputs.ref, 'refs/heads/feature/') && needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
@@ -47,10 +44,7 @@ jobs:
 
   run-dev:
     needs: detect
-    if: >
-      inputs.event_name == 'pull_request' &&
-      inputs.base_ref == 'dev' &&
-      ${{ needs.detect.outputs.services != '[]' }}
+    if: ${{ inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
@@ -60,10 +54,7 @@ jobs:
 
   run-prod:
     needs: detect
-    if: >
-      inputs.event_name == 'pull_request' &&
-      inputs.base_ref == 'main' &&
-      ${{ needs.detect.outputs.services != '[]' }}
+    if: ${{ inputs.event_name == 'pull_request' && inputs.base_ref == 'main' && needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
