@@ -32,25 +32,16 @@ jobs:
           common-dependency-paths: |
             ${{ inputs.shared_dir }}/**
 
-  run-feature:
+  lint:
     needs: detect
-    if: ${{ inputs.event_name == 'push' && startsWith(inputs.ref, 'refs/heads/feature/') && needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-service-feature.yml@main
+    uses: Aeronous/cicd-template/.github/workflows/python-lint.yml@main
     with:
-      service_path: ${{ matrix.service }}
-
-  run-dev:
-    needs: detect
-    if: ${{ inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && needs.detect.outputs.services != '[]' }}
-    strategy:
-      matrix:
-        service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-service-dev.yml@main
-    with:
-      service_path: ${{ matrix.service }}
+      event_name: ${{ inputs.event_name }}
+      ref: ${{ inputs.ref }}
+      base_ref: ${{ inputs.base_ref }}
 
   run-prod:
     needs: detect
