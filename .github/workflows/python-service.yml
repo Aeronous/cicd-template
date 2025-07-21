@@ -16,6 +16,10 @@ on:
       base_ref:
         required: false
         type: string
+      python_version:
+        required: false
+        type: string
+        default: '3.10'
 
 jobs:
   detect:
@@ -42,13 +46,6 @@ jobs:
       event_name: ${{ inputs.event_name }}
       ref: ${{ inputs.ref }}
       base_ref: ${{ inputs.base_ref }}
-
-  run-prod:
-    needs: detect
-    if: ${{ inputs.event_name == 'pull_request' && inputs.base_ref == 'main' && needs.detect.outputs.services != '[]' }}
-    strategy:
-      matrix:
-        service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-service-prod.yml@main
-    with:
       service_path: ${{ matrix.service }}
+      services: ${{ needs.detect.outputs.services }}
+      python_version: ${{ inputs.python_version }}

@@ -3,6 +3,9 @@ name: Lint Python Files
 on:
   workflow_call:
     inputs:
+      services:
+        required: true
+        type: string
       event_name:
         required: true
         type: string
@@ -12,12 +15,22 @@ on:
       base_ref:
         required: false
         type: string
+      service_path:
+        required: true
+        type: string
+      python_version:
+        required: false
+        type: string
+        default: '3.10'
 jobs:
   lint-python:
-    if: |
-      inputs.event_name == 'push' && startsWith(inputs.ref, 'refs/heads/feature/') && needs.detect.outputs.services != '[]' ||
-      inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && needs.detect.outputs.services != '[]'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.service_path }}
+    if: |
+      inputs.event_name == 'push' && startsWith(inputs.ref, 'refs/heads/feature/') && inputs.services != '[]' ||
+      inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && inputs.services != '[]'
 
     steps:
       - name: Checkout code
@@ -26,7 +39,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ inputs.python_version }}
 
       - name: Install flake8
         run: pip install flake8
