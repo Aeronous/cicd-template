@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       shared_dir:
-        description: 'Shared directory name (e.g., core)'
+        description: 'Shared folder prefix (e.g., core)'
         required: true
         type: string
 
@@ -12,20 +12,20 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     outputs:
-      services: ${{ steps.detect.outputs.services }}
+      services: ${{ steps.list.outputs.changed-directories }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Detect changed services
-        id: detect
-        uses: ./.github/actions/detect-services
+      - uses: sankichi92/list-changed-directories@v1.1.5
+        id: list
         with:
-          shared_dir: ${{ inputs.shared_dir }}
+          target-file: 'Dockerfile'
+          common-dependency-paths: |
+            ${{ inputs.shared_dir }}/**
 
   run-services:
     needs: detect
-    if: ${{ needs.detect.outputs.services != '' }}
+    if: ${{ needs.detect.outputs.services != '[]' }}
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
