@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-service/feature.yml@main
+    uses: Aeronous/cicd-template/.github/workflows/python-service-feature.yml@main
     with:
       service_path: ${{ matrix.service }}
 
@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-service/dev.yml@main
+    uses: Aeronous/cicd-template/.github/workflows/python-service-dev.yml@main
     with:
       service_path: ${{ matrix.service }}
 
@@ -58,6 +58,6 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-service/prod.yml@main
+    uses: Aeronous/cicd-template/.github/workflows/python-service-prod.yml@main
     with:
       service_path: ${{ matrix.service }}
