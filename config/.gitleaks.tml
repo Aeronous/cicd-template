@@ -1,0 +1,17 @@
+title = "Gitleaks config for monorepo with dev exclusions"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignore local dev environment secrets"
+paths = ["\\.env$", "\\.env\\..*$"]
+
+# Example custom rule for API key
+[[rules]]
+id = "generic-api-key"
+description = "Detect generic API keys"
+regex = '''(?i)(?:apikey|secret|token)[-_ ]?[a-z0-9]{20,}'''
+secretGroup = 0
+entropy = 3.5
+keywords = ["apikey", "secret", "token"]

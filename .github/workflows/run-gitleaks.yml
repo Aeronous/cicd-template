@@ -1,0 +1,58 @@
+name: Run Gitleaks Secret Scan
+
+on:
+  workflow_call:
+    inputs:
+      services:
+        required: true
+        type: string
+      event_name:
+        required: true
+        type: string
+      ref:
+        required: true
+        type: string
+      base_ref:
+        required: false
+        type: string
+      service_path:
+        required: true
+        type: string
+
+jobs:
+  gitleaks-scan:
+    if: |
+      inputs.event_name == 'pull_request' && inputs.base_ref == 'dev' && inputs.services != '[]'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.service_path }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download gitleaks config
+        run: |
+          curl -sSL https://raw.githubusercontent.com/Aeronous/cicd-template/main/config/.gitleaks.toml -o .gitleaks.toml
+
+      - name: Run Gitleaks scan and generate SARIF
+        uses: gacts/gitleaks@v2
+        with:
+          config-path: .gitleaks.toml
+          report-format: sarif
+          report-path: gitleaks.sarif
+
+      - name: Upload SARIF to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: gitleaks.sarif
+
+      - name: Fail if secrets found
+        run: |
+          if grep -q '"level": "error"' gitleaks.sarif; then
+            echo "❌ Secrets found in code. Please resolve before merging."
+            exit 1
+          else
+            echo "✅ No secrets detected by Gitleaks."
+          fi
