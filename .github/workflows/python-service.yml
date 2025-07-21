@@ -3,6 +3,16 @@ name: Python Service CI/CD
 on:
   workflow_call:
     inputs:
+      lint:
+        description: 'Run lint'
+        required: false
+        type: boolean
+        default: true
+      unit_tests:
+        description: 'Run unit tests'
+        required: false
+        type: boolean
+        default: true
       shared_dir:
         description: 'Shared folder prefix (e.g., core)'
         required: true
@@ -37,11 +47,27 @@ jobs:
             ${{ inputs.shared_dir }}/**
 
   lint:
+    if: ${{ inputs.lint }}
     needs: detect
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
     uses: Aeronous/cicd-template/.github/workflows/python-lint.yml@main
+    with:
+      event_name: ${{ inputs.event_name }}
+      ref: ${{ inputs.ref }}
+      base_ref: ${{ inputs.base_ref }}
+      service_path: ${{ matrix.service }}
+      services: ${{ needs.detect.outputs.services }}
+      python_version: ${{ inputs.python_version }}
+
+  unit-tests:
+    if: ${{ inputs.unit_tests }}
+    needs: detect
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect.outputs.services) }}
+    uses: Aeronous/cicd-template/.github/workflows/python-unit-tests.yml@main
     with:
       event_name: ${{ inputs.event_name }}
       ref: ${{ inputs.ref }}
