@@ -75,27 +75,27 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: python-test-results
+          name: ${{ inputs.service_path }}-python-test-results
           path: ${{ inputs.service_path }}/test-results.xml
 
       - name: Upload coverage report (xml)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-xml
+          name: ${{ inputs.service_path }}-coverage-xml
           path: ${{ inputs.service_path }}/coverage.xml
 
       - name: Upload coverage report (HTML)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html
+          name: ${{ inputs.service_path }}-coverage-html
           path: ${{ inputs.service_path }}/htmlcov/
       
       - name: Publish Test Report (visual UI)
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: Pytest Report
+          name: ${{ inputs.service_path }}-pytest-report
           path: ${{ inputs.service_path }}/test-results.xml
           reporter: java-junit
