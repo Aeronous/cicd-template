@@ -37,7 +37,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect.outputs.services) }}
-    uses: Aeronous/cicd-template/.github/workflows/python-lint.yml@main
+    uses: Aeronous/cicd-template/.github/workflows/python-lint.yml@dev
     with:
       event_name: ${{ inputs.event_name }}
       ref: ${{ inputs.ref }}
