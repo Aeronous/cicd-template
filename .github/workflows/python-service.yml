@@ -1,0 +1,63 @@
+name: Python Service CI/CD
+
+on:
+  workflow_call:
+    inputs:
+      shared_dir:
+        description: 'Shared folder prefix (e.g., core)'
+        required: true
+        type: string
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.list.outputs.changed-directories }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: sankichi92/list-changed-directories@v1.1.5
+        id: list
+        with:
+          target-file: 'Dockerfile'
+          common-dependency-paths: |
+            ${{ inputs.shared_dir }}/**
+
+  run-feature:
+    needs: detect
+    if: >
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/heads/feature/') &&
+      ${{ needs.detect.outputs.services != '[]' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect.outputs.services) }}
+    uses: Aeronous/cicd-template/.github/workflows/python-service/feature.yml@main
+    with:
+      service_path: ${{ matrix.service }}
+
+  run-dev:
+    needs: detect
+    if: >
+      github.event_name == 'pull_request' &&
+      github.base_ref == 'dev' &&
+      ${{ needs.detect.outputs.services != '[]' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect.outputs.services) }}
+    uses: Aeronous/cicd-template/.github/workflows/python-service/dev.yml@main
+    with:
+      service_path: ${{ matrix.service }}
+
+  run-prod:
+    needs: detect
+    if: >
+      github.event_name == 'pull_request' &&
+      github.base_ref == 'main' &&
+      ${{ needs.detect.outputs.services != '[]' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect.outputs.services) }}
+    uses: Aeronous/cicd-template/.github/workflows/python-service/prod.yml@main
+    with:
+      service_path: ${{ matrix.service }}

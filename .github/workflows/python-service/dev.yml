@@ -1,4 +1,4 @@
-name: CI Core
+name: Python Service Dev
 
 on:
   workflow_call:
@@ -13,4 +13,4 @@ jobs:
     steps:
       - name: Show selected service
         run: |
-            echo "🛠 Running CI for service: ${{ inputs.service_path }}"
+            echo "🛠 Running CI for service: ${{ inputs.service_path }} in dev"
